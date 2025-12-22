@@ -1,0 +1,13 @@
+[build]
+  base = "public"
+  command = ""
+  publish = "."
+
+[build.environment]
+  HUGO_VERSION = ""
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/*"
+  to = "/alerts.html"
+  status = 200
