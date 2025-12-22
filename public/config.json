@@ -1,0 +1,38 @@
+{
+  "username": "akai120_",
+  "gifts": {
+    "rosa": {
+      "minCoins": 1,
+      "media": "./media/basicos/rosa.gif",
+      "sound": "./sounds/basicos/rosa.mp3",
+      "duration": 5000
+    },
+    "corazon": {
+      "minCoins": 10,
+      "media": "./media/basicos/corazon.gif",
+      "sound": "./sounds/basicos/corazon.mp3",
+      "duration": 6000
+    },
+    "dragon": {
+      "minCoins": 2000,
+      "media": "./media/premium/dragon.gif",
+      "sound": "./sounds/premium/dragon.mp3",
+      "duration": 10000
+    }
+  },
+  "interactions": {
+    "follow": {
+      "enabled": true,
+      "media": "./media/follow.mp4",
+      "sound": "./sounds/follow.mp3",
+      "duration": 5000
+    },
+    "like": {
+      "enabled": true,
+      "minLikes": 50,
+      "media": "./media/like.jpg",
+      "sound": "./sounds/like.mp3",
+      "duration": 4000
+    }
+  }
+}

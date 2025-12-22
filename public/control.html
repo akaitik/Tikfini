@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><title>Control Alertas</title></head>
+<body style="font-family:Arial;background:#222;color:white;padding:50px">
+  <h1>🎮 CONTROL DE ALERTAS</h1>
+  <button onclick="sendGift('rosa')" style="background:pink;padding:15px;font-size:20px;margin:10px">🌹 Rosa</button>
+  <button onclick="sendGift('corazon')" style="background:red;padding:15px;font-size:20px;margin:10px">💖 Corazón</button>
+  <button onclick="sendFollow()" style="background:blue;padding:15px;font-size:20px;margin:10px">➕ Follow</button>
+  
+  <script>
+    const ws = new WebSocket('ws://192.168.18.27:8081');
+    
+    function sendGift(gift) {
+      ws.send(JSON.stringify({
+        type: 'gift',
+        user: 'TestUser',
+        gift: gift,
+        amount: 1
+      }));
+    }
+    
+    function sendFollow() {
+      ws.send(JSON.stringify({
+        type: 'follow',
+        user: 'NuevoFollower'
+      }));
+    }
+    
+    ws.onopen = () => console.log('✅ Control conectado');
+  </script>
+</body>
+</html>

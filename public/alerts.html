@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alertas TikTok</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: red;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+    }
+
+    #connection-status {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+
+    #connection-status.connected {
+      background: #4CAF50;
+      color: white;
+    }
+
+    #connection-status.disconnected {
+      background: #f44336;
+      color: white;
+    }
+
+    #connection-status.connecting {
+      background: #ff9800;
+      color: white;
+    }
+
+    #test-panel {
+      position: absolute;
+      top: 50px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      z-index: 999;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    #test-panel h3 {
+      margin: 0 0 10px 0;
+      color: white;
+      font-size: 16px;
+    }
+
+    #test-panel button {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.1s;
+    }
+
+    #test-panel button:hover {
+      transform: scale(1.05);
+    }
+
+    #test-panel button:active {
+      transform: scale(0.95);
+    }
+
+    .btn-gift { background: #FF6B9D; color: white; }
+    .btn-like { background: #FF3B4E; color: white; }
+    .btn-follow { background: #00D9FF; color: white; }
+    .btn-share { background: #FFD700; color: black; }
+    .btn-fan { background: #FF4500; color: white; }
+    .btn-sticker { background: #9C27B0; color: white; }
+
+    .media-options {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+
+    .media-options label {
+      color: white;
+      display: block;
+      margin: 5px 0;
+      cursor: pointer;
+    }
+
+    .media-options input[type="checkbox"] {
+      margin-right: 5px;
+    }
+
+    .info-box {
+      background: rgba(33, 150, 243, 0.2);
+      border-left: 3px solid #2196F3;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 3px;
+      color: #fff;
+      font-size: 11px;
+    }
+
+    .section-title {
+      color: #FFD700;
+      margin: 15px 0 5px 0;
+      font-size: 12px;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+      padding-bottom: 3px;
+    }
+
+    #alert-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+
+    #alert-container.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    #alert-media {
+      max-width: 300px;
+      max-height: 300px;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      display: none;
+    }
+
+    #alert-media.show {
+      display: block;
+    }
+
+    #alert-text {
+      text-align: center;
+      font-size: 48px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 20px rgba(0, 0, 0, 0.8),
+                   0 0 40px rgba(0, 0, 0, 0.5);
+    }
+
+    #event-log {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #00ff00;
+      padding: 10px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
+      max-width: 400px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    #event-log div {
+      margin: 2px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="connection-status" class="connecting">Conectando...</div>
+
+  <div id="test-panel">
+    <h3>🎮 Panel de Pruebas</h3>
+    
+    <div class="info-box">
+      📁 <strong>Estructura organizada:</strong><br>
+      • media/basicos/ (1-99 monedas)<br>
+      • media/medios/ (100-999)<br>
+      • media/premium/ (1000-4999)<br>
+      • media/vip/ (5000+)<br>
+      • media/stickers/ (personalizados)<br>
+      <br>
+      ⏱️ <strong>Sistema de cola:</strong><br>
+      • Las alertas se muestran una por una<br>
+      • Duración personalizable por alerta
+      <br><br>
+      🔧 <strong>Config JSON:</strong><br>
+      • config.json ahora controla todo<br>
+      • stickerConfig como fallback
+    </div>
+    
+    <div class="media-options">
+      <label>
+        <input type="checkbox" id="enable-sound" checked> 🔊 Sonido
+      </label>
+      <label>
+        <input type="checkbox" id="enable-media" checked> 🎬 Imagen/Video
+      </label>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 📝 AQUÍ MODIFICAS LOS NOMBRES DE LOS BOTONES -->
+    <!-- ============================================ -->
+    
+    <div class="section-title">⚡ ALERTAS BÁSICAS</div>
+    <button class="btn-like" onclick="testAlert('like')">❤️ Like</button>
+    <button class="btn-follow" onclick="testAlert('follow')">➕ Follow</button>
+    <button class="btn-share" onclick="testAlert('share')">📢 Share</button>
+    <button class="btn-fan" onclick="testAlert('fan_emoji')">🔥 Fan Emoji</button>
+
+    <div class="section-title">🎁 REGALOS</div>
+    <button class="btn-gift" onclick="testGift('rosa')">🌹 Rosa (1)</button>
+    <button class="btn-gift" onclick="testGift('corazon')">💖 Corazón (10)</button>
+    <button class="btn-gift" onclick="testGift('estrella')">⭐ Estrella (99)</button>
+    <button class="btn-gift" onclick="testGift('leon')">🦁 León (500)</button>
+    <button class="btn-gift" onclick="testGift('dragon')">🐉 Dragón (2000)</button>
+    <button class="btn-gift" onclick="testGift('galaxia')">🌌 Galaxia (5000)</button>
+    
+    <div class="section-title">🎨 STICKERS PERSONALIZADOS</div>
+    <button class="btn-sticker" onclick="testSticker('baile')">💃 Baile</button>
+    <button class="btn-sticker" onclick="testSticker('risa')">😂 Risa</button>
+    <button class="btn-sticker" onclick="testSticker('fuego')">🔥 Fuego</button>
+    <button class="btn-sticker" onclick="testSticker('wow')">😱 Wow</button>
+  </div>
+
+  <div id="alert-container">
+    <img id="alert-media" src="" alt="Alert Media" />
+    <video id="alert-video"
+ muted
+ autoplay
+ playsinline
+ loop
+ style="display:none; max-width:300px; max-height:300px; border-radius:10px; box-shadow:0 0 30px rgba(0,0,0,0.8);">
+    </video>
+
+    <div id="alert-text"></div>
+  </div>
+
+  <div id="event-log"></div>
+
+  <script>
+    const alertContainer = document.getElementById("alert-container");
+    const alertText = document.getElementById("alert-text");
+    const alertMedia = document.getElementById("alert-media");
+    const alertVideo = document.getElementById("alert-video");
+    const connectionStatus = document.getElementById("connection-status");
+    const eventLog = document.getElementById("event-log");
+    const enableSound = document.getElementById("enable-sound");
+    const enableMedia = document.getElementById("enable-media");
+
+    // ============================================
+    // 🔧 NUEVO: CARGAR CONFIG.JSON
+    // ============================================
+    let config = null;
+    fetch('./config.json')
+      .then(res => res.json())
+      .then(json => {
+        config = json;
+        addLog('✅ Configuración cargada desde config.json', 'success');
+      })
+      .catch(err => {
+        console.error('❌ Error cargando config.json', err);
+        addLog('ℹ️ config.json no encontrado, usando stickerConfig', 'info');
+      });
+
+    // ============================================
+    // 🎨 CONFIGURACIÓN COMPLETA (FALLBACK)
+    // ============================================
+    const stickerConfig = {
+      
+      // ========================================
+      // ⚡ ALERTAS BÁSICAS
+      // ========================================
+      "like": { 
+        media: "./media/like.jpg", 
+        sound: "./sounds/like.mp3",
+        duration: 3000  
+      },
+      "follow": { 
+        media: "./media/follow.mp4", 
+        sound: "./sounds/follow.mp3",
+        duration: 4000  
+      },
+      "share": { 
+        media: "./media/share.gif", 
+        sound: "./sounds/share.mp3",
+        duration: 3500  
+      },
+      "fan_emoji": { 
+        media: "./media/fan.gif", 
+        sound: "./sounds/fan.mp3",
+        duration: 3000  
+      },
+      
+      // ========================================
+      // 🎁 REGALOS BÁSICOS (1-99 monedas)
+      // ========================================
+      "rosa": { 
+        media: "./media/basicos/rosa.gif", 
+        sound: "./sounds/basicos/rosa.mp3",
+        duration: 3000
+      },
+      "dedos-cruzados": { 
+        media: "./media/basicos/dedos-cruzados.gif", 
+        sound: "./sounds/basicos/dedos-cruzados.mp3",
+        duration: 3000
+      },
+      "corazon": { 
+        media: "./media/basicos/corazon.gif", 
+        sound: "./sounds/basicos/corazon.mp3",
+        duration: 3500
+      },
+      "helado": { 
+        media: "./media/basicos/helado.gif", 
+        sound: "./sounds/basicos/helado.mp3",
+        duration: 3000
+      },
+      "amor": { 
+        media: "./media/basicos/amor.gif", 
+        sound: "./sounds/basicos/amor.mp3",
+        duration: 3500
+      },
+      "donuts": { 
+        media: "./media/basicos/donuts.gif", 
+        sound: "./sounds/basicos/donuts.mp3",
+        duration: 3000
+      },
+      "arcoiris": { 
+        media: "./media/basicos/arcoiris.gif", 
+        sound: "./sounds/basicos/arcoiris.mp3",
+        duration: 4000
+      },
+      "estrella": { 
+        media: "./media/basicos/estrella.gif", 
+        sound: "./sounds/basicos/estrella.mp3",
+        duration: 4000
+      },
+      
+      // ========================================
+      // 💎 REGALOS MEDIOS (100-999 monedas)
+      // ========================================
+      "perfume": { 
+        media: "./media/medios/perfume.gif", 
+        sound: "./sounds/medios/perfume.mp3",
+        duration: 4000
+      },
+      "pastel": { 
+        media: "./media/medios/pastel.gif", 
+        sound: "./sounds/medios/pastel.mp3",
+        duration: 4000
+      },
+      "corona": { 
+        media: "./media/medios/corona.gif", 
+        sound: "./sounds/medios/corona.mp3",
+        duration: 4500
+      },
+      "drama-queen": { 
+        media: "./media/medios/drama-queen.gif", 
+        sound: "./sounds/medios/drama-queen.mp3",
+        duration: 4500
+      },
+      "cohete": { 
+        media: "./media/medios/cohete.gif", 
+        sound: "./sounds/medios/cohete.mp3",
+        duration: 5000
+      },
+      "fuegos-artificiales": { 
+        media: "./media/medios/fuegos-artificiales.gif", 
+        sound: "./sounds/medios/fuegos-artificiales.mp3",
+        duration: 5000
+      },
+      "corazon-brillante": { 
+        media: "./media/medios/corazon-brillante.gif", 
+        sound: "./sounds/medios/corazon-brillante.mp3",
+        duration: 4500
+      },
+      "cisne": { 
+        media: "./media/medios/cisne.gif", 
+        sound: "./sounds/medios/cisne.mp3",
+        duration: 4500
+      },
+      "anillo-de-diamante": { 
+        media: "./media/medios/anillo-de-diamante.gif", 
+        sound: "./sounds/medios/anillo-de-diamante.mp3",
+        duration: 5000
+      },
+      "leon": { 
+        media: "./media/medios/leon.gif", 
+        sound: "./sounds/medios/leon.mp3",
+        duration: 5000
+      },
+      
+      // ========================================
+      // 💎💎 REGALOS PREMIUM (1000-4999 monedas)
+      // ========================================
+      "delfin": { 
+        media: "./media/premium/delfin.gif", 
+        sound: "./sounds/premium/delfin.mp3",
+        duration: 6000
+      },
+      "rayo": { 
+        media: "./media/premium/rayo.gif", 
+        sound: "./sounds/premium/rayo.mp3",
+        duration: 6000
+      },
+      "unicornio": { 
+        media: "./media/premium/unicornio.gif", 
+        sound: "./sounds/premium/unicornio.mp3",
+        duration: 7000
+      },
+      "planeta": { 
+        media: "./media/premium/planeta.gif", 
+        sound: "./sounds/premium/planeta.mp3",
+        duration: 6500
+      },
+      "dragon": { 
+        media: "./media/premium/dragon.gif", 
+        sound: "./sounds/premium/dragon.mp3",
+        duration: 7000
+      },
+      "castillo": { 
+        media: "./media/premium/castillo.gif", 
+        sound: "./sounds/premium/castillo.mp3",
+        duration: 6500
+      },
+      "meteoro": { 
+        media: "./media/premium/meteoro.gif", 
+        sound: "./sounds/premium/meteoro.mp3",
+        duration: 6000
+      },
+      "aguila": { 
+        media: "./media/premium/aguila.gif", 
+        sound: "./sounds/premium/aguila.mp3",
+        duration: 6000
+      },
+      "phoenix": { 
+        media: "./media/premium/phoenix.gif", 
+        sound: "./sounds/premium/phoenix.mp3",
+        duration: 7000
+      },
+      
+      // ========================================
+      // 👑 REGALOS VIP (5000+ monedas)
+      // ========================================
+      "galaxia": { 
+        media: "./media/vip/galaxia.gif", 
+        sound: "./sounds/vip/galaxia.mp3",
+        duration: 8000
+      },
+      "ballena": { 
+        media: "./media/vip/ballena.gif", 
+        sound: "./sounds/vip/ballena.mp3",
+        duration: 8000
+      },
+      "yate": { 
+        media: "./media/vip/yate.gif", 
+        sound: "./sounds/vip/yate.mp3",
+        duration: 9000
+      },
+      "avion": { 
+        media: "./media/vip/avion.gif", 
+        sound: "./sounds/vip/avion.mp3",
+        duration: 9000
+      },
+      "castillo-de-lujo": { 
+        media: "./media/vip/castillo-de-lujo.gif", 
+        sound: "./sounds/vip/castillo-de-lujo.mp3",
+        duration: 10000
+      },
+      "tiktok-universe": { 
+        media: "./media/vip/tiktok-universe.gif", 
+        sound: "./sounds/vip/tiktok-universe.mp3",
+        duration: 12000
+      },
+      "lion": { 
+        media: "./media/vip/lion.gif", 
+        sound: "./sounds/vip/lion.mp3",
+        duration: 10000
+      },
+      "adams-dream": { 
+        media: "./media/vip/adams-dream.gif", 
+        sound: "./sounds/vip/adams-dream.mp3",
+        duration: 12000
+      },
+
+      // ========================================
+      // 🎨 STICKERS PERSONALIZADOS
+      // ========================================
+      "baile": { 
+        media: "./media/stickers/baile.gif", 
+        sound: "./sounds/stickers/baile.mp3",
+        duration: 4000
+      },
+      "risa": { 
+        media: "./media/stickers/risa.gif", 
+        sound: "./sounds/stickers/risa.mp3",
+        duration: 3000
+      },
+      "754907332152787464": { 
+        media: "./media/stickers/risa.gif", 
+        sound: "./sounds/stickers/risa.mp3",
+        duration: 3000
+      },
+      "fuego": { 
+        media: "./media/stickers/fuego.gif", 
+        sound: "./sounds/stickers/fuego.mp3",
+        duration: 3500
+      },
+      "wow": { 
+        media: "./media/stickers/wow.gif", 
+        sound: "./sounds/stickers/wow.mp3",
+        duration: 3000
+      },
+      "llanto": { 
+        media: "./media/stickers/llanto.gif", 
+        sound: "./sounds/stickers/llanto.mp3",
+        duration: 3500
+      },
+      "aplausos": { 
+        media: "./media/stickers/aplausos.gif", 
+        sound: "./sounds/stickers/aplausos.mp3",
+        duration: 4000
+      },
+      "enamorado": { 
+        media: "./media/stickers/enamorado.gif", 
+        sound: "./sounds/stickers/enamorado.mp3",
+        duration: 3500
+      },
+      "sorpresa": { 
+        media: "./media/stickers/sorpresa.gif", 
+        sound: "./sounds/stickers/sorpresa.mp3",
+        duration: 3000
+      }
+    };
+
+    // ============================================
+    // 📋 SISTEMA DE COLA DE ALERTAS
+    // ============================================
+    const alertQueue = [];
+    let isShowingAlert = false;
+    const DEFAULT_DURATION = 4000;
+
+    let ws = null;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+    const audioCache = {};
+    let reconnectInterval = null;
+
+    function addLog(message, type = 'info') {
+      const logEntry = document.createElement('div');
+      const timestamp = new Date().toLocaleTimeString();
+      logEntry.textContent = `[${timestamp}] ${message}`;
+      if (type === 'error') logEntry.style.color = '#ff4444';
+      if (type === 'success') logEntry.style.color = '#44ff44';
+      if (type === 'warning') logEntry.style.color = '#ffaa44';
+      if (type === 'info') logEntry.style.color = '#44aaff';
+      eventLog.insertBefore(logEntry, eventLog.firstChild);
+      
+      while (eventLog.children.length > 10) {
+        eventLog.removeChild(eventLog.lastChild);
+      }
+    }
+
+    function getAudio(soundPath) {
+      if (!soundPath) return null;
+      
+      if (!audioCache[soundPath]) {
+        audioCache[soundPath] = new Audio(soundPath);
+        audioCache[soundPath].preload = 'auto';
+      }
+      return audioCache[soundPath];
+    }
+
+    function normalizeStickerName(name) {
+     if (!name) return '';
+     if (/^\d+$/.test(name)) return name;
+     return name.toLowerCase()
+               .replace(/\s+/g, '-')
+               .replace(/[^\w-]/g, '');
+    }
+
+    // ============================================
+    // 🔧 NUEVA getStickerConfig CON config.json
+    // ============================================
+    function getStickerConfig(stickerName, type) {
+      const normalized = normalizeStickerName(stickerName || type);
+      
+      // 1) PRIORIDAD: config.json si está cargado
+      if (config) {
+        // Gifts desde config.gifts
+        if (type === 'gift' && config.gifts && config.gifts[normalized]) {
+          const g = config.gifts[normalized];
+          if (g.minCoins === undefined || (data && data.amount >= g.minCoins)) {
+            addLog(`✅ Config JSON gift: ${normalized}`, 'success');
+            return {
+              media: g.media,
+              sound: g.sound,
+              duration: g.duration || DEFAULT_DURATION
+            };
+          }
+        }
+
+        // Interacciones desde config.interactions
+        if (config.interactions && config.interactions[type]) {
+          const inter = config.interactions[type];
+          if (inter.enabled !== false) {
+            addLog(`✅ Config JSON interaction: ${type}`, 'success');
+            return {
+              media: inter.media,
+              sound: inter.sound,
+              duration: inter.duration || DEFAULT_DURATION
+            };
+          }
+        }
+      }
+
+      // 2) FALLBACK: stickerConfig original
+      if (stickerConfig[normalized]) {
+        addLog(`✅ Config stickerConfig: ${normalized}`);
+        return stickerConfig[normalized];
+      }
+      
+      if (stickerConfig[type]) {
+        return stickerConfig[type];
+      }
+      
+      // 3) ÚLTIMO RECURSO: rutas automáticas
+      addLog(`⚠️ No hay config para "${normalized}", usando ruta automática`, 'warning');
+      return {
+        media: `./media/${normalized}.gif`,
+        sound: `./sounds/${normalized}.mp3`,
+        duration: DEFAULT_DURATION
+      };
+    }
+
+    function connectWebSocket() {
+      try {
+        connectionStatus.className = 'connecting';
+        connectionStatus.textContent = 'Conectando...';
+        addLog('Intentando conectar al WebSocket...');
+
+        ws = new WebSocket("ws://localhost:8081");
+
+        ws.onopen = () => {
+         console.log("✅ Conectado al WebSocket");
+         connectionStatus.className = 'connected';
+         connectionStatus.textContent = '🟢 Conectado';
+         addLog('✅ Conectado al WebSocket', 'success');
+         reconnectAttempts = 0;
+         
+         if (reconnectInterval) {
+           clearInterval(reconnectInterval);
+           reconnectInterval = null;
+         }
+        };
+
+       ws.onmessage = (event) => {
+     if (!event.data) {
+       addLog("⚠️ Mensaje WS vacío ignorado", "warning");
+       return;
+     }
+
+     let data;
+
+     try {
+       data = JSON.parse(event.data);
+     } catch (err) {
+       addLog(`⚠️ Mensaje WS no-JSON ignorado: ${event.data}`, "warning");
+       return;
+     }
+
+     if (!data || typeof data !== "object" || !data.type) {
+       addLog("⚠️ Mensaje WS inválido (sin type)", "warning");
+       return;
+     }
+
+     console.log("📨 Alerta válida recibida:", data);
+     addLog(
+       `📨 Alerta: ${data.type}` +
+       `${data.gift ? ' - ' + data.gift : ''}` +
+       `${data.sticker ? ' - ' + data.sticker : ''}`
+     );
+
+     addToQueue(data);
+    };
+
+        ws.onerror = (error) => {
+         console.error("❌ Error WebSocket:", error);
+         addLog('❌ Error de conexión', 'error');
+        };
+
+        ws.onclose = () => {
+         console.log("🔌 WebSocket desconectado");
+         connectionStatus.className = 'disconnected';
+         connectionStatus.textContent = '🔴 Desconectado';
+         addLog('🔌 WebSocket desconectado', 'error');
+
+         if (reconnectAttempts < maxReconnectAttempts) {
+           reconnectAttempts++;
+           addLog(`Reintentando en 3s... (${reconnectAttempts}/${maxReconnectAttempts})`);
+           setTimeout(connectWebSocket, 3000);
+         } else {
+           addLog('⏳ Modo espera activado: reconexión cada 10s', 'info');
+           connectionStatus.textContent = '⏳ Esperando live';
+           
+           if (!reconnectInterval) {
+             reconnectInterval = setInterval(() => {
+               addLog('🔄 Intentando reconectar...', 'info');
+               reconnectAttempts = 0;
+               connectWebSocket();
+             }, 10000);
+           }
+         }
+        };
+      } catch (error) {
+        console.error("Error al conectar:", error);
+        connectionStatus.className = 'disconnected';
+        connectionStatus.textContent = '🔴 Error';
+        addLog('❌ Error al conectar: ' + error.message, 'error');
+      }
+    }
+
+    // ============================================
+    // 📋 FUNCIONES DE COLA
+    // ============================================
+    
+    function addToQueue(data) {
+      alertQueue.push(data);
+      addLog(`📋 Alerta en cola (${alertQueue.length} esperando)`, 'info');
+      
+      if (!isShowingAlert) {
+        processQueue();
+      }
+    }
+
+    function processQueue() {
+      if (alertQueue.length === 0) {
+        return;
+      }
+
+      if (isShowingAlert) {
+        return;
+      }
+
+      const nextAlert = alertQueue.shift();
+      addLog(`▶️ Mostrando alerta de la cola (${alertQueue.length} restantes)`, 'success');
+      showAlert(nextAlert);
+    }
+
+    function showAlert(data) {
+      let text = "";
+      let config;
+
+      if (data.type === "gift" && data.gift) {
+        config = getStickerConfig(data.gift, "gift");
+      } else if (data.type === "sticker" && data.sticker) {
+        config = getStickerConfig(data.sticker, "sticker");
+      } else {
+        config = getStickerConfig(null, data.type);
+      }
+
+      if (data.media) config.media = data.media;
+      if (data.sound) config.sound = data.sound;
+      if (data.duration) config.duration = data.duration;
+
+      const duration = config.duration || DEFAULT_DURATION;
+
+      switch (data.type) {
+        case "test":
+          text = data.message || "🧪 Alerta de prueba";
+          break;
+
+        case "gift":
+          text = `🎁 ${data.user} envió ${data.amount || 1} ${data.gift || 'regalo'}`;
+          break;
+
+        case "like":
+          text = `❤️ ${data.user} dio ${data.count || 1} likes`;
+          break;
+
+        case "follow":
+          text = `➕ ${data.user} empezó a seguirte`;
+          break;
+
+        case "share":
+          text = `📢 ${data.user} compartió el live`;
+          break;
+
+        case "fan_emoji":
+          text = `🔥 ${data.user}: ${data.message || '¡Fan!'}`;
+          break;
+
+        case "sticker":
+          text = `${data.user} envió: ${data.sticker || ''}`;
+          break;
+
+        default:
+          text = `⚠️ ${data.type}`;
+      }
+
+      alertText.textContent = text;
+
+      if (enableSound.checked && config.sound) {
+        const audio = getAudio(config.sound);
+        if (audio) {
+          audio.currentTime = 0;
+          audio.play().catch(e => {
+            addLog(`⚠️ Audio no disponible: ${config.sound}`, 'warning');
+            console.error('Error reproduciendo audio:', e);
+          });
+        }
+      } else if (enableSound.checked && !config.sound) {
+        addLog(`ℹ️ No hay sonido configurado para este tipo`, 'info');
+      }
+
+    if (enableMedia.checked && config.media) {
+     const isVideo = config.media.endsWith('.mp4') || config.media.endsWith('.webm');
+
+     alertMedia.classList.remove("show");
+     alertVideo.style.display = "none";
+     alertVideo.pause();
+
+     if (isVideo) {
+       alertVideo.src = config.media;
+       alertVideo.style.display = "block";
+       alertVideo.currentTime = 0;
+       alertVideo.play().catch(() => {});
+       addLog(`🎬 Reproduciendo video: ${config.media.substring(0, 50)}...`);
+     } else {
+       alertMedia.src = config.media;
+       alertMedia.classList.add("show");
+
+       alertMedia.onload = () => {
+         addLog(`🖼️ Imagen cargada: ${config.media.substring(0, 50)}...`);
+       };
+
+       alertMedia.onerror = () => {
+         addLog(`⚠️ Imagen no encontrada: ${config.media}`, 'warning');
+         alertMedia.classList.remove("show");
+       };
+     }
+    } else {
+     alertMedia.classList.remove("show");
+     alertVideo.style.display = "none";
+    }
+
+      alertContainer.classList.add("show");
+      isShowingAlert = true;
+
+      setTimeout(() => {
+        alertContainer.classList.remove("show");
+        setTimeout(() => {
+          alertMedia.classList.remove("show");
+          isShowingAlert = false;
+          processQueue();
+        }, 300);
+      }, duration);
+    }
+
+    function testAlert(type) {
+      const testData = {
+        like: { 
+          type: 'like', 
+          user: 'TestUser', 
+          count: 100
+        },
+        follow: { 
+          type: 'follow', 
+          user: 'NuevoSeguidor'
+        },
+        share: { 
+          type: 'share', 
+          user: 'TestUser'
+        },
+        fan_emoji: { 
+          type: 'fan_emoji', 
+          user: 'SuperFan', 
+          message: '¡Increíble!'
+        }
+      };
+
+      addLog(`🎮 Prueba: ${type} | Sonido: ${enableSound.checked ? 'ON' : 'OFF'} | Media: ${enableMedia.checked ? 'ON' : 'OFF'}`, 'success');
+      addToQueue(testData[type]);
+    }
+
+    function testGift(giftName) {
+      addLog(`🎁 Prueba regalo: ${giftName}`, 'success');
+      addToQueue({
+        type: 'gift',
+        user: 'TestUser',
+        amount: 1,
+        gift: giftName
+      });
+    }
+
+    function testSticker(stickerName) {
+      addLog(`🎨 Prueba sticker: ${stickerName}`, 'success');
+      addToQueue({
+        type: 'sticker',
+        user: 'TestUser',
+        sticker: stickerName
+      });
+    }
+
+    connectWebSocket();
+    addLog('🚀 Sistema iniciado con cola de alertas', 'success');
+    addLog(`📦 ${Object.keys(stickerConfig).length} alertas configuradas`);
+    addLog('📋 Sistema de cola: Las alertas se muestran una por una');
+    addLog('⏱️ Duración personalizable para cada alerta');
+    addLog('💡 Organiza tus archivos en: basicos/, medios/, premium/, vip/, stickers/');
+    addLog('🔧 config.json tiene PRIORIDAD sobre stickerConfig');
+  </script>
+
+</body>
+</html>
