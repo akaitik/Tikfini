@@ -5,632 +5,396 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>💀BIENVENIDO AKAI💀</title>
   <style>
-    :root {
-      --bg-main: #101317;
-      --bg-panel: #181c22;
-      --bg-panel-alt: #15181e;
-      --border-soft: #2a2f38;
-      --accent: #1e90ff;
-      --accent-soft: #3fa9ff;
-      --danger: #ff4b4b;
-      --text-main: #f5f5f5;
-      --text-muted: #a0a4b0;
-    }
-
-    * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      background: radial-gradient(circle at top, #181c22 0, #05070a 50%, #000 100%);
-      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--text-main);
+      background: #111111;
+      font-family: 'Segoe UI', Arial, sans-serif;
       min-height: 100vh;
+      padding: 20px;
+      color: #f5f5f5;
     }
 
-    .app {
-      display: flex;
-      min-height: 100vh;
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      border: 1px solid #333333;
     }
 
-    /* Sidebar fake (solo decorativa para parecer app) */
-    .sidebar {
-      width: 230px;
-      background: #05070a;
-      border-right: 1px solid #14171d;
-      padding: 15px 0;
-      color: var(--text-muted);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar-header {
-      padding: 0 20px 15px;
-      border-bottom: 1px solid #14171d;
-      margin-bottom: 10px;
-    }
-
-    .sidebar-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .sidebar-user {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .sidebar-section-title {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      padding: 10px 20px 5px;
-      color: var(--text-muted);
-    }
-
-    .sidebar-item {
-      padding: 8px 20px;
-      font-size: 13px;
-      cursor: default;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .sidebar-item.active {
-      background: linear-gradient(90deg, rgba(30,144,255,0.2), transparent);
-      color: var(--text-main);
-      border-left: 3px solid var(--accent);
-    }
-
-    .sidebar-item span.icon {
-      width: 18px;
+    h1 {
       text-align: center;
-    }
-
-    /* Main layout */
-    .main {
-      flex: 1;
-      padding: 20px 26px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .topbar-title {
-      font-size: 24px;
-      font-weight: 700;
       color: #ffffff;
-      text-shadow: 0 0 18px rgba(255,0,0,0.6);
+      margin-bottom: 30px;
+      font-size: 2.6em;
+      text-shadow: 0 0 15px rgba(255,0,0,0.6);
     }
 
-    .topbar-sub {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 4px;
+    h1::before {
+      content: "💀BIENVENIDO AKAI💀";
     }
 
-    .badge-live {
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(255,75,75,0.1);
-      border: 1px solid var(--danger);
-      color: var(--danger);
-      font-size: 11px;
-      font-weight: 600;
+    h1 span { display: none; }
+
+    .config-section {
+      background: #181818;
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      border: 1px solid #333333;
     }
 
-    .main-panels {
+    .config-section h2 {
+      margin-top: 0;
+      color: #ffffff;
+      border-left: 4px solid #ff4b4b;
+      padding-left: 10px;
+      font-size: 1.2em;
+    }
+
+    .upload-zone {
+      border: 2px dashed #ff4b4b;
+      border-radius: 15px;
+      padding: 35px;
+      text-align: center;
+      margin: 20px 0;
+      background: #181818;
+      transition: all 0.2s;
+      cursor: pointer;
+      color: #f0f0f0;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: #ffffff;
+      background: #222222;
+      transform: scale(1.01);
+    }
+
+    .file-list {
       display: grid;
-      grid-template-columns: 2.3fr 1fr;
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 10px 0;
     }
 
-    .panel {
-      background: var(--bg-panel);
-      border-radius: 10px;
-      border: 1px solid var(--border-soft);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-      padding: 14px 16px 16px;
+    .file-item {
+      background: #202020;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 12px;
+      color: #f0f0f0;
+      border: 1px solid #333333;
     }
 
-    .panel-header {
+    .gift-selector {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
     }
 
-    .panel-title {
-      font-size: 14px;
+    .gift-btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 999px;
+      background: #333333;
+      color: #f5f5f5;
       font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 12px;
+    }
+
+    .gift-btn:hover {
+      background: #ff4b4b;
       color: #ffffff;
     }
 
-    .panel-subtitle {
-      font-size: 11px;
-      color: var(--text-muted);
+    .gift-btn.active {
+      background: #ff0000;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(255,0,0,0.7);
     }
 
-    .btn {
-      border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 12px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 600;
+    .config-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 15px 0;
     }
 
-    .btn-primary {
-      background: var(--accent);
-      color: white;
+    label {
+      font-size: 13px;
+      color: #f0f0f0;
+      display: block;
+      margin-bottom: 4px;
     }
 
-    .btn-primary:hover {
-      background: var(--accent-soft);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-muted);
-    }
-
-    .btn-ghost:hover {
-      background: var(--bg-panel-alt);
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: #fff;
-    }
-
-    .btn-danger:hover {
-      background: #ff2d2d;
-    }
-
-    /* Tabla principal */
-    .table-wrapper {
-      margin-top: 8px;
+    input, select {
+      width: 100%;
+      padding: 10px;
       border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid #262b35;
-      background: var(--bg-panel-alt);
+      border: 1px solid #444444;
+      background: #202020;
+      color: #ffffff;
+      font-size: 13px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-
-    thead {
-      background: #14171d;
-    }
-
-    th, td {
-      padding: 6px 8px;
-      text-align: left;
-      border-bottom: 1px solid #262b35;
-    }
-
-    th {
-      font-weight: 600;
-      color: var(--text-muted);
-      font-size: 11px;
-    }
-
-    tbody tr:hover {
-      background: rgba(255,255,255,0.02);
-    }
-
-    .col-enabled {
-      width: 40px;
-      text-align: center;
-    }
-
-    .col-actions {
-      width: 40px;
-      text-align: center;
-    }
-
-    .toggle {
-      width: 32px;
-      height: 16px;
-      border-radius: 999px;
-      background: #2b3038;
-      position: relative;
-      cursor: pointer;
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    .toggle::after {
-      content: "";
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #888;
-      position: absolute;
-      top: 2px;
-      left: 3px;
-      transition: all .15s;
-    }
-
-    .toggle.on {
-      background: rgba(30,144,255,0.4);
-    }
-
-    .toggle.on::after {
-      left: 17px;
-      background: #1e90ff;
-    }
-
-    select, input[type="number"] {
-      width: 100%;
-      background: #0f1116;
-      border: 1px solid #262b35;
-      border-radius: 4px;
-      padding: 4px 6px;
-      color: var(--text-main);
-      font-size: 11px;
-    }
-
-    select:focus, input[type="number"]:focus {
+    input:focus,
+    select:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(30,144,255,0.5);
+      border-color: #ff4b4b;
+      box-shadow: 0 0 4px rgba(255,0,0,0.7);
     }
 
-    .sound-select-btn {
-      width: 100%;
-      background: #151920;
-      border: 1px solid #262b35;
-      border-radius: 4px;
-      padding: 4px 6px;
-      color: var(--text-main);
-      text-align: left;
+    .save-btn {
+      grid-column: span 2;
+      padding: 14px;
+      background: #ff4b4b;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
-      font-size: 11px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      margin-top: 5px;
+      transition: all 0.15s;
     }
 
-    .sound-select-btn span.label {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .save-btn:hover {
+      background: #ff0000;
+      box-shadow: 0 8px 18px rgba(255,0,0,0.6);
     }
 
-    .slider-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .slider-wrapper input[type="range"] {
-      flex: 1;
-      accent-color: var(--accent);
-    }
-
-    .slider-wrapper span {
-      font-size: 10px;
-      color: var(--text-muted);
-      width: 28px;
-      text-align: right;
-    }
-
-    /* panel lateral */
-    .setting-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 4px 0;
+    .preview {
+      background: #101010;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+      max-height: 260px;
+      overflow-y: auto;
+      font-family: monospace;
       font-size: 12px;
-      color: var(--text-muted);
+      color: #e0e0e0;
+      border: 1px solid #333333;
     }
 
-    .setting-row strong {
-      color: var(--text-main);
+    .preview-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
     }
 
-    .pill {
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: #111318;
-      border: 1px solid #262b35;
-      font-size: 11px;
-      color: var(--text-muted);
+    .download-btn {
+      width: 100%;
+      padding: 16px;
+      background: #ffffff;
+      color: #111111;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.15s;
     }
 
-    .helper {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
-
-    .helper a {
-      color: var(--accent-soft);
-      text-decoration: none;
-    }
-
-    .helper a:hover {
-      text-decoration: underline;
+    .download-btn:hover {
+      background: #ff4b4b;
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(255,0,0,0.6);
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <!-- Sidebar decorativa -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-title">TikFinity Akai</div>
-        <div class="sidebar-user">@akai120_</div>
+  <div class="container">
+    <h1><span>TikFinity Editor</span></h1>
+
+    <div class="config-section">
+      <h2>📁 Subir Archivos</h2>
+      <div class="upload-zone" id="upload-zone">
+        <div style="font-size: 24px; margin-bottom: 10px;">⬆️</div>
+        <div>Arrastra GIF, MP4, MP3 aquí</div>
+        <input type="file" id="file-input" multiple accept="image/*,video/*,audio/*" style="display:none;">
       </div>
+      <div class="file-list" id="file-list"></div>
+    </div>
 
-      <div class="sidebar-section-title">Overlays</div>
-      <div class="sidebar-item"><span class="icon">🎯</span>Goal Overlays</div>
-      <div class="sidebar-item"><span class="icon">🖼️</span>Gift Overlays</div>
-      <div class="sidebar-item active"><span class="icon">🔊</span>Sound Alerts</div>
-
-      <div class="sidebar-section-title">Tools</div>
-      <div class="sidebar-item"><span class="icon">⚙️</span>General Settings</div>
-      <div class="sidebar-item"><span class="icon">🧪</span>Test Panel</div>
-    </aside>
-
-    <!-- Contenido principal -->
-    <main class="main">
-      <div class="topbar">
-        <div>
-          <div class="topbar-title">💀BIENVENIDO AKAI💀</div>
-          <div class="topbar-sub">Configura qué sonido suena para cada regalo o interacción.</div>
+    <div class="config-section">
+      <h2>🎁 Configurar Regalos</h2>
+      <div class="gift-selector" id="gift-selector"></div>
+      
+      <div id="config-form" style="display:none;">
+        <div class="config-form">
+          <div>
+            <label>⏱️ Duración (ms)</label>
+            <input type="number" id="duration" value="4000" min="1000" max="20000">
+          </div>
+          <div>
+            <label>🎬 Video/Imagen</label>
+            <select id="media-select">
+              <option value="">Ninguno</option>
+            </select>
+          </div>
+          <div>
+            <label>🔊 Sonido</label>
+            <select id="sound-select">
+              <option value="">Ninguno</option>
+            </select>
+          </div>
+          <div>
+            <label>💰 Mínimo Coins</label>
+            <input type="number" id="min-coins" value="1" min="1">
+          </div>
         </div>
-        <div class="badge-live">config.html • editor local</div>
+        <button class="save-btn" onclick="saveConfig()">💾 GUARDAR CONFIGURACIÓN</button>
       </div>
+    </div>
 
-      <div class="main-panels">
-        <!-- Panel principal tabla -->
-        <section class="panel">
-          <div class="panel-header">
-            <div>
-              <div class="panel-title">Sound Alerts</div>
-              <div class="panel-subtitle">Cada fila es un trigger (gift / follow / like) con su sonido y volumen.</div>
-            </div>
-            <div>
-              <button class="btn btn-primary" onclick="addRow()">+ Crear alerta</button>
-              <button class="btn btn-ghost" onclick="resetFromConfig()">↻ Recargar</button>
-            </div>
-          </div>
-
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th class="col-enabled">On</th>
-                  <th>Trigger</th>
-                  <th>Sound</th>
-                  <th>Volume</th>
-                  <th>Duración (ms)</th>
-                  <th class="col-actions">Del</th>
-                </tr>
-              </thead>
-              <tbody id="alerts-body">
-                <!-- filas generadas por JS -->
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- Panel lateral -->
-        <section class="panel">
-          <div class="panel-header">
-            <div class="panel-title">Settings</div>
-          </div>
-
-          <div class="setting-row">
-            <span>Play sounds simultaneously</span>
-            <span class="pill">On</span>
-          </div>
-          <div class="setting-row">
-            <span>Play only first emote</span>
-            <span class="pill">Off</span>
-          </div>
-          <div class="setting-row">
-            <span>Max queue length</span>
-            <span class="pill">Unlimited</span>
-          </div>
-
-          <div class="helper">
-            • Los cambios se aplican solo a <code>config.json</code>.<br>
-            • Pulsa “Guardar config.json” y súbelo a tu repo.<br>
-          </div>
-
-          <div style="margin-top:14px">
-            <button class="btn btn-primary" style="width:100%" onclick="downloadConfig()">💾 Guardar config.json</button>
-          </div>
-          <div style="margin-top:8px">
-            <button class="btn btn-danger" style="width:100%" onclick="clearAll()">🧨 Vaciar todo (gifts/interactions)</button>
-          </div>
-        </section>
-      </div>
-    </main>
+    <div class="config-section">
+      <h2>📋 Configuración Actual</h2>
+      <div class="preview" id="preview">Cargando...</div>
+      <button class="download-btn" onclick="downloadConfig()">💾 DESCARGAR config.json</button>
+    </div>
   </div>
 
   <script>
-    // Estado en memoria
-    let config = { username: "akai120_", gifts: {}, interactions: {} };
+    let config = { gifts: {}, interactions: {}, username: 'akai120_' };
+    let files = {};
+    let currentGift = '';
 
-    // Lista de triggers conocidos
-    const TRIGGERS = [
-      "rosa","corazon","estrella","perfume","leon","dragon","galaxia","cohete","unicornio",
-      "follow","like","share","fan_emoji"
-    ];
-
-    // Cargar config.json
-    fetch("./config.json")
+    fetch('./config.json')
       .then(r => r.json())
       .then(data => {
         config = data;
         if (!config.gifts) config.gifts = {};
         if (!config.interactions) config.interactions = {};
-        buildTableFromConfig();
+        updatePreview();
       })
-      .catch(() => {
-        buildTableFromConfig();
+      .catch(() => { updatePreview(); });
+
+    const uploadZone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('file-input');
+
+    uploadZone.addEventListener('click', () => fileInput.click());
+    uploadZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      handleFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+    function handleFiles(fileList) {
+      Array.from(fileList).forEach(file => {
+        const type = file.type.split('/')[0];
+        const base = file.name.split('.')[0].toLowerCase();
+        if (!files[base]) files[base] = {};
+        if (type === 'image') files[base].image = `./media/${base}.gif`;
+        if (type === 'video') files[base].video = `./media/${base}.mp4`;
+        if (type === 'audio') files[base].audio = `./sounds/${base}.mp3`;
       });
+      updateFileList();
+      updateSelectors();
+    }
 
-    function buildTableFromConfig() {
-      const tbody = document.getElementById("alerts-body");
-      tbody.innerHTML = "";
+    function updateFileList() {
+      const list = document.getElementById('file-list');
+      list.innerHTML = Object.entries(files).map(([name, types]) => 
+        `<div class="file-item">${name}<br>${Object.keys(types).join(', ')}</div>`
+      ).join('');
+    }
 
-      // gifts
-      Object.entries(config.gifts || {}).forEach(([key, value]) => {
-        addRowFromConfig("gift", key, value);
+    function updateSelectors() {
+      const mediaSelect = document.getElementById('media-select');
+      const soundSelect = document.getElementById('sound-select');
+      mediaSelect.innerHTML = '<option value="">Ninguno</option>';
+      soundSelect.innerHTML = '<option value="">Ninguno</option>';
+
+      Object.entries(files).forEach(([name, types]) => {
+        if (types.image || types.video) {
+          mediaSelect.innerHTML += `<option value="${types.image || types.video}">${name}</option>`;
+        }
+        if (types.audio) {
+          soundSelect.innerHTML += `<option value="${types.audio}">${name}</option>`;
+        }
       });
+    }
 
-      // interactions
-      Object.entries(config.interactions || {}).forEach(([key, value]) => {
-        addRowFromConfig("interaction", key, value);
-      });
+    const gifts = ['rosa', 'corazon', 'estrella', 'leon', 'dragon', 'galaxia', 'perfume', 'follow', 'like', 'share'];
+    const giftSelector = document.getElementById('gift-selector');
+    giftSelector.innerHTML = gifts.map(g => 
+      `<button class="gift-btn" data-gift="${g}">${g.toUpperCase()}</button>`
+    ).join('');
 
-      if (!tbody.children.length) {
-        // añade algunas filas por defecto
-        ["rosa","corazon","follow","like"].forEach(t => addRow(t.startsWith("rosa") || t.startsWith("corazon") ? "gift" : "interaction", t));
+    giftSelector.addEventListener('click', e => {
+      if (!e.target.classList.contains('gift-btn')) return;
+      selectGift(e.target.getAttribute('data-gift'), e.target);
+    });
+
+    function selectGift(gift, btnEl) {
+      currentGift = gift;
+      document.querySelectorAll('.gift-btn').forEach(btn => btn.classList.remove('active'));
+      btnEl.classList.add('active');
+
+      document.getElementById('config-form').style.display = 'block';
+
+      const cfg = config.gifts[gift] || config.interactions[gift] || {};
+      document.getElementById('duration').value = cfg.duration || 4000;
+      document.getElementById('min-coins').value = cfg.minCoins || 1;
+      document.getElementById('media-select').value = cfg.media || '';
+      document.getElementById('sound-select').value = cfg.sound || '';
+    }
+
+    function saveConfig() {
+      if (!currentGift) {
+        alert('Selecciona un regalo primero');
+        return;
       }
+
+      const newConfig = {
+        minCoins: parseInt(document.getElementById('min-coins').value) || 1,
+        media: document.getElementById('media-select').value,
+        sound: document.getElementById('sound-select').value,
+        duration: parseInt(document.getElementById('duration').value) || 4000
+      };
+
+      if (!config.gifts) config.gifts = {};
+      config.gifts[currentGift] = newConfig;
+
+      updatePreview();
+      alert(`✅ ${currentGift} guardado`);
     }
 
-    function addRowFromConfig(kind, key, value) {
-      const enabled = value.enabled !== false;
-      const volume = value.volume != null ? value.volume : 1;
-      const duration = value.duration || 4000;
-      addRow(kind, key, value.media || "", value.sound || "", enabled, volume, duration, false);
-    }
-
-    function addRow(kind = "gift", triggerKey = "", media = "", sound = "", enabled = true, volume = 1, duration = 4000, focus = false) {
-      const tbody = document.getElementById("alerts-body");
-      const tr = document.createElement("tr");
-      tr.dataset.kind = kind;
-
-      tr.innerHTML = `
-        <td class="col-enabled">
-          <div class="toggle ${enabled ? "on" : ""}" onclick="toggleEnabled(this)"></div>
-        </td>
-        <td>
-          <select onchange="onTriggerChange(this)">
-            ${TRIGGERS.map(t => `<option value="${t}" ${t === triggerKey ? "selected" : ""}>${t.toUpperCase()}</option>`).join("")}
-          </select>
-        </td>
-        <td>
-          <button class="sound-select-btn" onclick="editSound(this)">
-            <span class="label">${sound || "Select sound"}</span>
-            <span>▾</span>
-          </button>
-        </td>
-        <td>
-          <div class="slider-wrapper">
-            <input type="range" min="0" max="1" step="0.05" value="${volume}">
-            <span>${Math.round(volume * 100)}%</span>
-          </div>
-        </td>
-        <td>
-          <input type="number" value="${duration}" min="500" max="20000">
-        </td>
-        <td class="col-actions">
-          <button class="btn btn-ghost" onclick="deleteRow(this)">🗑️</button>
-        </td>
-      `;
-
-      // evento slider
-      const range = tr.querySelector('input[type="range"]');
-      range.addEventListener("input", () => {
-        tr.querySelector(".slider-wrapper span").textContent = `${Math.round(range.value * 100)}%`;
-      });
-
-      tbody.appendChild(tr);
-      if (focus) tr.querySelector("select").focus();
-    }
-
-    function toggleEnabled(el) {
-      el.classList.toggle("on");
-    }
-
-    function deleteRow(btn) {
-      const tr = btn.closest("tr");
-      tr.remove();
-    }
-
-    function onTriggerChange(selectEl) {
-      // opcional: evitar triggers duplicados, etc.
-    }
-
-    function editSound(btn) {
-      const current = btn.querySelector(".label").textContent;
-      const file = prompt("Ruta del sonido (ej: ./sounds/basicos/rosa.mp3):", current === "Select sound" ? "" : current);
-      if (file !== null && file.trim() !== "") {
-        btn.querySelector(".label").textContent = file.trim();
+    function updatePreview() {
+      const preview = document.getElementById('preview');
+      const entries = Object.entries(config.gifts || {});
+      if (!entries.length) {
+        preview.textContent = 'No hay configuraciones aún.';
+        return;
       }
-    }
-
-    function resetFromConfig() {
-      buildTableFromConfig();
-    }
-
-    function clearAll() {
-      if (!confirm("¿Seguro que quieres borrar TODAS las entradas de gifts e interactions de config.json?")) return;
-      config.gifts = {};
-      config.interactions = {};
-      buildTableFromConfig();
+      preview.innerHTML = entries.map(([name, data]) => 
+        `<div class="preview-line">
+          <span>${name}</span>
+          <span>${data.duration || 0}ms ${data.media ? '🎬' : ''} ${data.sound ? '🔊' : ''}</span>
+        </div>`
+      ).join('');
     }
 
     function downloadConfig() {
-      // reconstruir config desde la tabla
-      const tbody = document.getElementById("alerts-body");
-      const rows = Array.from(tbody.querySelectorAll("tr"));
-
-      const newGifts = {};
-      const newInter = {};
-
-      rows.forEach(tr => {
-        const kind = tr.dataset.kind || "gift";
-        const enabled = tr.querySelector(".toggle").classList.contains("on");
-        const trigger = tr.querySelector("select").value;
-        const sound = tr.querySelector(".sound-select-btn .label").textContent;
-        const volume = parseFloat(tr.querySelector('input[type="range"]').value);
-        const duration = parseInt(tr.querySelector('input[type="number"]').value) || 4000;
-
-        const obj = {
-          enabled: enabled,
-          sound: sound !== "Select sound" ? sound : "",
-          duration,
-          volume
-        };
-
-        // aquí podrías mapear media si quieres; por ahora solo sonido
-        if (kind === "gift") {
-          obj.minCoins = (config.gifts && config.gifts[trigger] && config.gifts[trigger].minCoins) || 1;
-          newGifts[trigger] = Object.assign({}, config.gifts[trigger] || {}, obj);
-        } else {
-          newInter[trigger] = Object.assign({}, config.interactions[trigger] || {}, obj);
-        }
-      });
-
-      config.gifts = newGifts;
-      config.interactions = newInter;
-
       const dataStr = JSON.stringify(config, null, 2);
-      const uri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-      const link = document.createElement("a");
+      const uri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+      const link = document.createElement('a');
       link.href = uri;
-      link.download = "config.json";
+      link.download = 'config.json';
       link.click();
     }
   </script>
