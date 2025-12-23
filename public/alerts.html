@@ -1,153 +1,38 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TikTok Alerts</title>
+  <title>Alertas Test</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: transparent;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      height: 100vh;
-    }
-    #alert-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      opacity: 0;
-      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-      pointer-events: none;
-    }
-    #alert-container.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    #alert-media { 
-      max-width: 350px; 
-      max-height: 350px; 
-      border-radius: 20px; 
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      display: none;
-    }
-    #alert-media.show { display: block; }
-    #alert-video {
-      max-width: 350px;
-      max-height: 350px;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      display: none;
-    }
-    #alert-text {
-      font-size: 52px;
-      font-weight: bold;
-      color: white;
-      text-shadow: 0 0 20px rgba(0,0,0,0.9);
-      text-align: center;
-      background: rgba(0,0,0,0.5);
-      padding: 15px 30px;
-      border-radius: 25px;
-    }
+    body { margin: 0; background: red; color: white; font-family: Arial; }
+    #status { position: fixed; top: 10px; right: 10px; background: black; padding: 10px; }
+    #log { position: fixed; bottom: 10px; left: 10px; background: black; color: lime; padding: 10px; max-height: 200px; overflow: auto; }
   </style>
 </head>
 <body>
-  <div id="alert-container">
-    <img id="alert-media" src="" alt="">
-    <video id="alert-video" muted playsinline></video>
-    <div id="alert-text"></div>
-  </div>
-
+  <div id="status">🔴 Desconectado</div>
+  <div id="log">Iniciando...</div>
+  
   <script>
-    const DEFAULT_DURATION = 4000;
-    let config = { gifts: {}, interactions: {} };
+    let ws;
+    function addLog(msg) {
+      document.getElementById('log').innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
+      document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+    }
     
-    // Cargar config.json
-    fetch('./config.json')
-      .then(r => r.json())
-      .then(data => config = data)
-      .catch(() => {});
-
-    const stickerConfig = {
-      "follow": { media: "./media/follow.mp4", sound: "./sounds/follow.mp3", duration: 4000 },
-      "like": { media: "./media/like.jpg", sound: "./sounds/like.mp3", duration: 3000 },
-      "share": { media: "./media/share.gif", sound: "./sounds/share.mp3", duration: 3500 },
-      "fan_emoji": { media: "./media/fan.gif", sound: "./sounds/fan.mp3", duration: 3000 },
-      "rosa": { media: "./media/basicos/rosa.gif", sound: "./sounds/basicos/rosa.mp3", duration: 3000 },
-      "corazon": { media: "./media/basicos/corazon.gif", sound: "./sounds/basicos/corazon.mp3", duration: 3500 },
-      "estrella": { media: "./media/basicos/estrella.gif", sound: "./sounds/basicos/estrella.mp3", duration: 4000 },
-      "leon": { media: "./media/medios/leon.gif", sound: "./sounds/medios/leon.mp3", duration: 5000 },
-      "dragon": { media: "./media/premium/dragon.gif", sound: "./sounds/premium/dragon.mp3", duration: 7000 },
-      "galaxia": { media: "./media/vip/galaxia.gif", sound: "./sounds/vip/galaxia.mp3", duration: 8000 }
+    addLog('Conectando ws://192.168.18.27:8081');
+    ws = new WebSocket('ws://192.168.18.27:8081');
+    
+    ws.onopen = () => {
+      document.getElementById('status').textContent = '🟢 Conectado';
+      addLog('✅ WebSocket OK');
     };
-
-    const alertQueue = [];
-    let isShowing = false;
-    const audioCache = {};
-
-    function getConfig(type, name) {
-      const key = name || type;
-      return config.gifts?.[key] || config.interactions?.[key] || stickerConfig[key] || {
-        media: `./media/${key}.gif`,
-        sound: `./sounds/${key}.mp3`,
-        duration: DEFAULT_DURATION
-      };
-    }
-
-    const ws = new WebSocket('ws://localhost:8081');
+    
     ws.onmessage = (e) => {
-      try {
-        const data = JSON.parse(e.data);
-        if (data.type) {
-          alertQueue.push(data);
-          if (!isShowing) showNext();
-        }
-      } catch {}
+      const data = JSON.parse(e.data);
+      addLog(`🎁 ${data.user} → ${data.gift || data.type}`);
     };
-
-    function showNext() {
-      if (alertQueue.length === 0 || isShowing) return;
-      isShowing = true;
-      const data = alertQueue.shift();
-      const cfg = getConfig(data.type, data.gift || data.sticker);
-      
-      document.getElementById('alert-text').textContent = 
-        data.type === 'gift' ? `🎁 ${data.user} ${data.amount || 1}x ${data.gift}` :
-        data.type === 'follow' ? `➕ ${data.user} siguió` :
-        data.type === 'like' ? `❤️ ${data.user} likes` : `${data.type.toUpperCase()}`;
-      
-      const isVideo = cfg.media?.endsWith('.mp4') || cfg.media?.endsWith('.webm');
-      const media = isVideo ? document.getElementById('alert-video') : document.getElementById('alert-media');
-      media.src = cfg.media;
-      media.classList.add('show');
-      if (isVideo) media.play();
-      
-      if (cfg.sound && !audioCache[cfg.sound]) {
-        audioCache[cfg.sound] = new Audio(cfg.sound);
-      }
-      if (audioCache[cfg.sound]) {
-        audioCache[cfg.sound].currentTime = 0;
-        audioCache[cfg.sound].play().catch(() => {});
-      }
-      
-      document.getElementById('alert-container').classList.add('show');
-      
-      setTimeout(() => {
-        document.getElementById('alert-container').classList.remove('show');
-        setTimeout(() => {
-          media.classList.remove('show');
-          if (isVideo) media.pause();
-          media.src = '';
-          isShowing = false;
-          showNext();
-        }, 500);
-      }, cfg.duration || DEFAULT_DURATION);
-    }
+    
+    ws.onerror = () => addLog('❌ WebSocket ERROR');
   </script>
 </body>
 </html>
