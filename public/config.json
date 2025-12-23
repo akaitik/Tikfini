@@ -5,19 +5,55 @@
       "minCoins": 1,
       "media": "./media/basicos/rosa.gif",
       "sound": "./sounds/basicos/rosa.mp3",
-      "duration": 5000
+      "duration": 4000
     },
     "corazon": {
       "minCoins": 10,
       "media": "./media/basicos/corazon.gif",
       "sound": "./sounds/basicos/corazon.mp3",
-      "duration": 6000
+      "duration": 4500
+    },
+    "estrella": {
+      "minCoins": 99,
+      "media": "./media/basicos/estrella.gif",
+      "sound": "./sounds/basicos/estrella.mp3",
+      "duration": 5000
+    },
+    "perfume": {
+      "minCoins": 100,
+      "media": "./media/medios/perfume.gif",
+      "sound": "./sounds/medios/perfume.mp3",
+      "duration": 5000
+    },
+    "leon": {
+      "minCoins": 500,
+      "media": "./media/medios/leon.gif",
+      "sound": "./sounds/medios/leon.mp3",
+      "duration": 6500
     },
     "dragon": {
       "minCoins": 2000,
       "media": "./media/premium/dragon.gif",
       "sound": "./sounds/premium/dragon.mp3",
+      "duration": 8500
+    },
+    "galaxia": {
+      "minCoins": 5000,
+      "media": "./media/vip/galaxia.gif",
+      "sound": "./sounds/vip/galaxia.mp3",
       "duration": 10000
+    },
+    "cohete": {
+      "minCoins": 300,
+      "media": "./media/medios/cohete.gif",
+      "sound": "./sounds/medios/cohete.mp3",
+      "duration": 5500
+    },
+    "unicornio": {
+      "minCoins": 1500,
+      "media": "./media/premium/unicornio.gif",
+      "sound": "./sounds/premium/unicornio.mp3",
+      "duration": 7500
     }
   },
   "interactions": {
@@ -32,7 +68,19 @@
       "minLikes": 50,
       "media": "./media/like.jpg",
       "sound": "./sounds/like.mp3",
+      "duration": 3500
+    },
+    "share": {
+      "enabled": true,
+      "media": "./media/share.gif",
+      "sound": "./sounds/share.mp3",
       "duration": 4000
+    },
+    "fan_emoji": {
+      "enabled": true,
+      "media": "./media/fan.gif",
+      "sound": "./sounds/fan.mp3",
+      "duration": 3500
     }
   }
 }
