@@ -56,7 +56,6 @@
       align-items: center;
       gap: 10px;
     }
-    /* 🆕 TABLA TIKFINITY */
     .gifts-table {
       width: 100%;
       border-collapse: collapse;
@@ -143,17 +142,25 @@
       font-size: 16px;
       padding: 16px 32px;
     }
-    .file-drop {
-      border: 2px dashed var(--text-muted);
-      border-radius: 12px;
-      padding: 32px;
-      text-align: center;
-      transition: 0.2s;
-      cursor: pointer;
+    .btn-test { 
+      background: #ffaa00 !important;
+      font-size: 18px;
+      padding: 16px 40px;
     }
-    .file-drop.dragover {
-      border-color: var(--accent-red);
-      background: rgba(255,68,68,0.1);
+    .btn-test:hover { background: #e69500 !important; }
+    .file-list {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .file-item {
+      background: var(--bg-panel-alt);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 12px;
+      border: 1px solid var(--border);
     }
     .config-preview {
       background: #0a0a0a;
@@ -164,6 +171,15 @@
       max-height: 200px;
       overflow-y: auto;
     }
+    #test-status {
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+    .status-success { background: rgba(0,204,136,0.2); color: #00cc88; }
+    .status-error { background: rgba(255,68,68,0.2); color: var(--accent-red); }
+    .status-connecting { background: rgba(255,170,0,0.2); color: #ffaa00; }
   </style>
 </head>
 <body>
@@ -172,22 +188,23 @@
       <h1>💀BIENVENIDO AKAI💀</h1>
     </div>
 
-    <!-- 📁 SUBIR ARCHIVOS -->
+    <!-- 🆕 LISTA AUTOMÁTICA MEDIA/SOUNDS -->
     <div class="section">
-      <div class="section-title">📁 Subir Archivos</div>
-      <div id="file-drop" class="file-drop">
-        Arrastra GIF/MP4/MP3 aquí
-        <div id="file-list"></div>
+      <div class="section-title">📁 Archivos Detectados</div>
+      <div class="file-list" id="file-list">
+        <div>Cargando archivos...</div>
       </div>
     </div>
 
     <!-- 🆕 TABLA TIKFINITY -->
     <div class="section">
       <div class="section-title">🎁 Sound Alerts</div>
-      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+      <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
         <button onclick="loadGiftsList()">🔄 Cargar Regalos Detectados</button>
         <button onclick="addNewGiftRow()">➕ Nuevo Regalo</button>
+        <button class="btn-test" onclick="testOverlay()">🧪 PROBAR OVERLAY</button>
       </div>
+      <div id="test-status"></div>
       <table class="gifts-table" id="gifts-table">
         <thead>
           <tr>
@@ -221,14 +238,79 @@
     let config = { username: 'akai120_', gifts: {}, interactions: {} };
     let availableFiles = { media: [], sounds: [] };
     let giftsList = {};
+    let ws = null;
+    const OVERLAY_URL = 'ws://localhost:8081'; // Cambia por tu IP si usas Netlify
+
+    // 🆕 LEER ARCHIVOS AUTOMÁTICO
+    async function scanFiles() {
+      try {
+        const mediaRes = await fetch('./media/');
+        const mediaText = await mediaRes.text();
+        availableFiles.media = mediaText.match(/href="([^"]*\.(gif|png|jpg|mp4))"/gi)?.map(m => m.replace(/href="|"/g, '')) || [];
+
+        const soundsRes = await fetch('./sounds/');
+        const soundsText = await soundsRes.text();
+        availableFiles.sounds = soundsText.match(/href="([^"]*\.mp3)"/gi)?.map(m => m.replace(/href="|"/g, '')) || [];
+
+        // 🆕 MOSTRAR LISTA VISUAL
+        const fileList = document.getElementById('file-list');
+        fileList.innerHTML = `
+          <div class="file-item"><strong>🎥 Media (${availableFiles.media.length})</strong></div>
+          ${availableFiles.media.slice(0, 12).map(f => `<div class="file-item">${f}</div>`).join('')}
+          <div class="file-item"><strong>🔊 Sounds (${availableFiles.sounds.length})</strong></div>
+          ${availableFiles.sounds.slice(0, 12).map(f => `<div class="file-item">${f}</div>`).join('')}
+        `;
+        renderTable();
+      } catch (e) {
+        document.getElementById('file-list').innerHTML = '<div class="file-item">Carpeta media/sounds no accesible (normal en Netlify)</div>';
+      }
+    }
+
+    // 🆕 BOTÓN PRUEBA OVERLAY
+    async function testOverlay() {
+      const status = document.getElementById('test-status');
+      status.textContent = '🟡 Conectando al overlay...';
+      status.className = 'status-connecting';
+
+      try {
+        // Probar conexión WebSocket
+        ws = new WebSocket(OVERLAY_URL);
+        await new Promise((resolve, reject) => {
+          ws.onopen = resolve;
+          ws.onerror = () => reject(new Error('WebSocket no disponible'));
+          setTimeout(() => reject(new Error('Timeout')), 3000);
+        });
+
+        // Enviar prueba de cada regalo configurado
+        let tests = 0;
+        const testGift = (giftName) => {
+          ws.send(JSON.stringify({
+            type: 'gift',
+            user: 'PruebaConfig',
+            amount: 1,
+            gift: giftName
+          }));
+          tests++;
+          console.log(`🧪 Enviado: ${giftName}`);
+        };
+
+        Object.keys(config.gifts).slice(0, 3).forEach(testGift); // 3 primeros
+        setTimeout(() => {
+          status.textContent = `✅ Overlay OK! Enviadas ${tests} alertas de prueba`;
+          status.className = 'status-success';
+          ws.close();
+        }, 1000);
+      } catch (e) {
+        status.textContent = `❌ Error: ${e.message}. Asegúrate: npm start`;
+        status.className = 'status-error';
+      }
+    }
 
     // 🆕 CARGAR REGALOS DETECTADOS
     async function loadGiftsList() {
       try {
         const res = await fetch('../gifts.json');
         giftsList = await res.json();
-        
-        // Convertir gifts detectados → filas editables
         Object.entries(giftsList).forEach(([key, gift]) => {
           if (!config.gifts[key]) {
             config.gifts[key] = {
@@ -241,17 +323,14 @@
         });
         renderTable();
         updatePreview();
-        addLog('🆕 Regalos detectados cargados: ' + Object.keys(giftsList).length);
       } catch {
-        addLog('ℹ️ No hay gifts.json aún. Usa live para detectar regalos.');
+        alert('ℹ️ No hay gifts.json. Haz live para detectar regalos.');
       }
     }
 
-    // 🆕 TABLA DINÁMICA
     function renderTable() {
       const tbody = document.getElementById('gifts-tbody');
       tbody.innerHTML = '';
-
       Object.entries({ ...config.gifts, ...config.interactions }).forEach(([key, settings]) => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -278,6 +357,7 @@
       });
     }
 
+    // Funciones auxiliares (iguales)
     function updateConfig(key, field, value) {
       const isGift = config.gifts[key];
       if (isGift) {
@@ -335,34 +415,8 @@
         JSON.stringify(config, null, 2).substring(0, 500) + '...';
     }
 
-    // Drag & Drop archivos
-    const dropZone = document.getElementById('file-drop');
-    dropZone.ondragover = e => {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    };
-    dropZone.ondragleave = () => dropZone.classList.remove('dragover');
-    dropZone.ondrop = e => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      const files = Array.from(e.dataTransfer.files);
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const name = file.name;
-          if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
-            availableFiles.media.push(`./media/${name}`);
-          } else if (file.type.startsWith('audio/')) {
-            availableFiles.sounds.push(`./sounds/${name}`);
-          }
-          renderTable();
-        };
-        reader.readAsDataURL(file);
-      });
-    };
-
-    // Inicializar
-    loadGiftsList();
+    // 🆕 INICIALIZAR TODO
+    scanFiles(); // Lee media/sounds AUTOMÁTICO
     if (localStorage.getItem('config')) {
       config = JSON.parse(localStorage.getItem('config'));
       renderTable();
@@ -371,4 +425,5 @@
   </script>
 </body>
 </html>
+
 
