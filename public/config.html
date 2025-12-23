@@ -3,139 +3,221 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TikFinity Editor</title>
+  <title>💀BIENVENIDO AKAI💀</title>
   <style>
     body {
       margin: 0;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      background: #111111;
       font-family: 'Segoe UI', Arial, sans-serif;
       min-height: 100vh;
       padding: 20px;
+      color: #f5f5f5;
     }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      background: rgba(255,255,255,0.1);
+      background: #1a1a1a;
       border-radius: 20px;
       padding: 30px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      border: 1px solid #333333;
     }
+
     h1 {
       text-align: center;
-      color: white;
+      color: #ffffff;
       margin-bottom: 30px;
-      font-size: 2.5em;
-      text-shadow: 0 0 20px rgba(255,255,255,0.5);
+      font-size: 2.6em;
+      text-shadow: 0 0 15px rgba(255,0,0,0.6);
     }
-    .upload-zone {
-      border: 3px dashed #FFD700;
-      border-radius: 15px;
-      padding: 40px;
-      text-align: center;
-      margin: 20px 0;
-      background: rgba(255,215,0,0.1);
-      transition: all 0.3s;
-      cursor: pointer;
+
+    /* Título nuevo */
+    h1::before {
+      content: "💀BIENVENIDO AKAI💀";
     }
-    .upload-zone:hover, .upload-zone.dragover {
-      border-color: #FF6B9D;
-      background: rgba(255,107,157,0.2);
-      transform: scale(1.02);
+
+    /* Si el HTML tuviera texto dentro del h1, lo ocultamos */
+    h1 span { 
+      display: none; 
     }
+
     .config-section {
-      background: rgba(0,0,0,0.4);
+      background: #181818;
       padding: 20px;
       border-radius: 15px;
       margin: 20px 0;
+      border: 1px solid #333333;
     }
+
+    .config-section h2 {
+      margin-top: 0;
+      color: #ffffff;
+      border-left: 4px solid #ff4b4b;
+      padding-left: 10px;
+      font-size: 1.2em;
+    }
+
+    .upload-zone {
+      border: 2px dashed #ff4b4b;
+      border-radius: 15px;
+      padding: 35px;
+      text-align: center;
+      margin: 20px 0;
+      background: #181818;
+      transition: all 0.2s;
+      cursor: pointer;
+      color: #f0f0f0;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: #ffffff;
+      background: #222222;
+      transform: scale(1.01);
+    }
+
+    .file-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .file-item {
+      background: #202020;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 12px;
+      color: #f0f0f0;
+      border: 1px solid #333333;
+    }
+
     .gift-selector {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
+
     .gift-btn {
-      padding: 12px 20px;
+      padding: 10px 18px;
       border: none;
-      border-radius: 25px;
-      background: linear-gradient(45deg, #FF6B9D, #FF8E8E);
-      color: white;
-      font-weight: bold;
+      border-radius: 999px;
+      background: #333333;
+      color: #f5f5f5;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s;
+      transition: all 0.15s;
+      font-size: 12px;
     }
+
+    .gift-btn:hover {
+      background: #ff4b4b;
+      color: #ffffff;
+    }
+
     .gift-btn.active {
-      background: linear-gradient(45deg, #FFD700, #FFA500);
-      box-shadow: 0 0 20px rgba(255,215,0,0.5);
+      background: #ff0000;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(255,0,0,0.7);
     }
+
     .config-form {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin: 20px 0;
+      gap: 12px;
+      margin: 15px 0;
     }
+
+    label {
+      font-size: 13px;
+      color: #f0f0f0;
+      display: block;
+      margin-bottom: 4px;
+    }
+
     input, select {
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.9);
-      font-size: 14px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #444444;
+      background: #202020;
+      color: #ffffff;
+      font-size: 13px;
     }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #ff4b4b;
+      box-shadow: 0 0 4px rgba(255,0,0,0.7);
+    }
+
     .save-btn {
       grid-column: span 2;
-      padding: 15px;
-      background: linear-gradient(45deg, #4CAF50, #81C784);
-      color: white;
-      font-size: 18px;
+      padding: 14px;
+      background: #ff4b4b;
+      color: #ffffff;
+      font-size: 16px;
       font-weight: bold;
       border: none;
-      border-radius: 15px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: all 0.3s;
+      margin-top: 5px;
+      transition: all 0.15s;
     }
+
     .save-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(76,175,80,0.4);
+      background: #ff0000;
+      box-shadow: 0 8px 18px rgba(255,0,0,0.6);
     }
+
     .preview {
-      background: rgba(0,0,0,0.6);
-      padding: 20px;
-      border-radius: 15px;
-      margin: 20px 0;
-      max-height: 300px;
+      background: #101010;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+      max-height: 260px;
       overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      color: #e0e0e0;
+      border: 1px solid #333333;
     }
+
+    .preview-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
     .download-btn {
       width: 100%;
-      padding: 20px;
-      background: linear-gradient(45deg, #2196F3, #42A5F5);
-      color: white;
-      font-size: 18px;
+      padding: 16px;
+      background: #ffffff;
+      color: #111111;
+      font-size: 16px;
       font-weight: bold;
       border: none;
-      border-radius: 15px;
-      cursor: pointer;
-      margin: 20px 0;
-    }
-    .file-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
-      margin: 10px 0;
-    }
-    .file-item {
-      background: rgba(255,255,255,0.1);
-      padding: 10px;
       border-radius: 10px;
-      text-align: center;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.15s;
+    }
+
+    .download-btn:hover {
+      background: #ff4b4b;
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(255,0,0,0.6);
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎮 TikFinity Editor</h1>
-    
+    <h1><span>TikFinity Editor</span></h1>
+
     <div class="config-section">
       <h2>📁 Subir Archivos</h2>
       <div class="upload-zone" id="upload-zone">
@@ -190,10 +272,17 @@
     let currentGift = '';
 
     // Cargar config existente
-    fetch('./config.json').then(r => r.json()).then(data => {
-      config = data;
-      updatePreview();
-    }).catch(() => {});
+    fetch('./config.json')
+      .then(r => r.json())
+      .then(data => {
+        config = data;
+        if (!config.gifts) config.gifts = {};
+        if (!config.interactions) config.interactions = {};
+        updatePreview();
+      })
+      .catch(() => {
+        updatePreview();
+      });
 
     // Subir archivos
     const uploadZone = document.getElementById('upload-zone');
@@ -215,12 +304,14 @@
     function handleFiles(fileList) {
       Array.from(fileList).forEach(file => {
         const type = file.type.split('/')[0];
-        const name = file.name.split('.')[0].toLowerCase();
-        if (!files[name]) files[name] = {};
-        files[name][type] = `./media/${name}.${type === 'image' ? 'gif' : type === 'video' ? 'mp4' : 'mp3'}`;
-        updateFileList();
-        updateSelectors();
+        const base = file.name.split('.')[0].toLowerCase();
+        if (!files[base]) files[base] = {};
+        if (type === 'image') files[base].image = `./media/${base}.gif`;
+        if (type === 'video') files[base].video = `./media/${base}.mp4`;
+        if (type === 'audio') files[base].audio = `./sounds/${base}.mp3`;
       });
+      updateFileList();
+      updateSelectors();
     }
 
     function updateFileList() {
@@ -231,33 +322,40 @@
     }
 
     function updateSelectors() {
-      ['media-select', 'sound-select'].forEach(id => {
-        const select = document.getElementById(id);
-        select.innerHTML = '<option value="">Ninguno</option>';
-        Object.entries(files).forEach(([name, types]) => {
-          if (types.image || types.video) {
-            select.innerHTML += `<option value="${types.image || types.video}">${name}</option>`;
-          }
-          if (types.audio) {
-            select.innerHTML += `<option value="${types.audio}">${name}</option>`;
-          }
-        });
+      const mediaSelect = document.getElementById('media-select');
+      const soundSelect = document.getElementById('sound-select');
+      mediaSelect.innerHTML = '<option value="">Ninguno</option>';
+      soundSelect.innerHTML = '<option value="">Ninguno</option>';
+
+      Object.entries(files).forEach(([name, types]) => {
+        if (types.image || types.video) {
+          mediaSelect.innerHTML += `<option value="${types.image || types.video}">${name}</option>`;
+        }
+        if (types.audio) {
+          soundSelect.innerHTML += `<option value="${types.audio}">${name}</option>`;
+        }
       });
     }
 
     // Regalos disponibles
     const gifts = ['rosa', 'corazon', 'estrella', 'leon', 'dragon', 'galaxia', 'perfume', 'follow', 'like', 'share'];
-    document.getElementById('gift-selector').innerHTML = gifts.map(g => 
-      `<button class="gift-btn" onclick="selectGift('${g}')">${g.toUpperCase()}</button>`
+    const giftSelector = document.getElementById('gift-selector');
+    giftSelector.innerHTML = gifts.map(g => 
+      `<button class="gift-btn" data-gift="${g}">${g.toUpperCase()}</button>`
     ).join('');
 
-    function selectGift(gift) {
+    giftSelector.addEventListener('click', e => {
+      if (!e.target.classList.contains('gift-btn')) return;
+      selectGift(e.target.getAttribute('data-gift'), e.target);
+    });
+
+    function selectGift(gift, btnEl) {
       currentGift = gift;
       document.querySelectorAll('.gift-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      
+      btnEl.classList.add('active');
+
       document.getElementById('config-form').style.display = 'block';
-      
+
       const cfg = config.gifts[gift] || config.interactions[gift] || {};
       document.getElementById('duration').value = cfg.duration || 4000;
       document.getElementById('min-coins').value = cfg.minCoins || 1;
@@ -266,38 +364,45 @@
     }
 
     function saveConfig() {
-      if (!currentGift) return alert('Selecciona un regalo');
-      
+      if (!currentGift) {
+        alert('Selecciona un regalo primero');
+        return;
+      }
+
       const newConfig = {
-        minCoins: parseInt(document.getElementById('min-coins').value),
+        minCoins: parseInt(document.getElementById('min-coins').value) || 1,
         media: document.getElementById('media-select').value,
         sound: document.getElementById('sound-select').value,
-        duration: parseInt(document.getElementById('duration').value)
+        duration: parseInt(document.getElementById('duration').value) || 4000
       };
-      
+
       if (!config.gifts) config.gifts = {};
       config.gifts[currentGift] = newConfig;
-      
+
       updatePreview();
-      alert(`✅ ${currentGift} guardado!`);
+      alert(`✅ ${currentGift} guardado`);
     }
 
     function updatePreview() {
       const preview = document.getElementById('preview');
-      if (Object.keys(config.gifts).length) {
-        preview.innerHTML = Object.entries(config.gifts).map(([name, data]) => 
-          `${name.padEnd(12)}: ${data.duration}ms (${data.media ? '🎬' : ''} ${data.sound ? '🔊' : ''})`
-        ).join('<br>');
-      } else {
-        preview.innerHTML = 'No hay configuraciones';
+      const entries = Object.entries(config.gifts || {});
+      if (!entries.length) {
+        preview.textContent = 'No hay configuraciones aún.';
+        return;
       }
+      preview.innerHTML = entries.map(([name, data]) => 
+        `<div class="preview-line">
+          <span>${name}</span>
+          <span>${data.duration || 0}ms ${data.media ? '🎬' : ''} ${data.sound ? '🔊' : ''}</span>
+        </div>`
+      ).join('');
     }
 
     function downloadConfig() {
       const dataStr = JSON.stringify(config, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+      const uri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
       const link = document.createElement('a');
-      link.href = dataUri;
+      link.href = uri;
       link.download = 'config.json';
       link.click();
     }
