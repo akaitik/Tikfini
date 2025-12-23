@@ -1,12 +1,5 @@
 {
   "username": "akai120_",
-  "gifts": {
-    "like": {
-      "minCoins": 1,
-      "media": "./media/fan.gif",
-      "sound": "./sounds/fan.mp3",
-      "duration": 5000
-    }
-  },
+  "gifts": {},
   "interactions": {}
 }
